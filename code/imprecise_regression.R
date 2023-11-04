@@ -256,15 +256,15 @@ round(
                                      global_freq=av_coverage_global_freq_ci, forest=av_coverage_forest)),
         width=colMeans(data.frame(global=av_ci_width_global_ci, local=av_ci_width_local_ci,
                                   global_freq=av_ci_width_global_freq_ci, forest=av_ci_width_forest))), 3)
-par(mfrow=c(1,2))
-boxplot(data.frame(global=av_coverage_global_ci,
-                   local=av_coverage_local_ci,
-                   global_freq=av_coverage_global_freq_ci,
-                   forest=av_coverage_forest), ylab='coverage')
-boxplot(data.frame(global=av_ci_width_global_ci,
-                   local=av_ci_width_local_ci,
-                   global_freq=av_ci_width_global_freq_ci,
-                   forest=av_ci_width_forest), ylab='interval widths')
+#par(mfrow=c(1,2))
+#boxplot(data.frame(global=av_coverage_global_ci,
+#                   local=av_coverage_local_ci,
+#                   global_freq=av_coverage_global_freq_ci,
+#                   forest=av_coverage_forest), ylab='coverage')
+#boxplot(data.frame(global=av_ci_width_global_ci,
+#                   local=av_ci_width_local_ci,
+#                   global_freq=av_ci_width_global_freq_ci,
+#                   forest=av_ci_width_forest), ylab='interval widths')
 
 ggplot(df, aes(x, y)) + 
   geom_point() +
