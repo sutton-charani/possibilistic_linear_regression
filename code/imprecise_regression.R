@@ -72,6 +72,7 @@ intercept_min <- confint(reg_model)['(Intercept)', 1]
 intercept_max <- confint(reg_model)['(Intercept)', 2]
 slope_min <- confint(reg_model)['x', 1]
 slope_max <- confint(reg_model)['x', 2]
+delta_ci <- 0.5
 
 ggplot(df, aes(x, y)) + 
   geom_point() +
