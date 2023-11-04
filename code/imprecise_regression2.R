@@ -34,7 +34,7 @@ yD <- df$y[which.min(df$x)]
 extreme_pts <- data.frame(x=c(xA, xB, xC, xD), y=c(yA, yB, yC, yD))
 
 ### Plot: scatter + precise slope + confidence band + plausibility band
-ggplot(df, aes(x, y)) + 
+p <- ggplot(df, aes(x, y)) + 
   geom_point() +
   geom_abline(intercept=reg_model$coefficients[1], slope=reg_model$coefficients[2], 
               col='blue', size=2) +
@@ -47,3 +47,5 @@ ggplot(df, aes(x, y)) +
               fill='yellow', alpha=0.5) +
   ggtitle(paste0("R2 = ", round(summary(reg_model)$adj.r.squared, 2))) +
   theme_bw()
+
+p
