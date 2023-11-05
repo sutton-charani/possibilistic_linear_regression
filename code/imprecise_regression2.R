@@ -4,7 +4,7 @@ graphics.off(); cat("\014"); rm(list=ls()) ;options(warn=-1)
 library(ggplot2); library(rpart); library(rpart.plot); library(randomForest)
 
 # Data definition
-df <- iris[c("Sepal.Length", "Sepal.Width")] # "Petal.Length", "Sepal.Length"
+df <- iris[c("Sepal.Length", "Petal.Width")] # "Petal.Length", "Sepal.Length"
 names(df) <- c("y", "x")
 
 # Scatterplot
