@@ -256,31 +256,17 @@ round(
                                      global_freq=av_coverage_global_freq_ci, forest=av_coverage_forest)),
         width=colMeans(data.frame(global=av_ci_width_global_ci, local=av_ci_width_local_ci,
                                   global_freq=av_ci_width_global_freq_ci, forest=av_ci_width_forest))), 3)
-#par(mfrow=c(1,2))
-#boxplot(data.frame(global=av_coverage_global_ci,
-#                   local=av_coverage_local_ci,
-#                   global_freq=av_coverage_global_freq_ci,
-#                   forest=av_coverage_forest), ylab='coverage')
-#boxplot(data.frame(global=av_ci_width_global_ci,
-#                   local=av_ci_width_local_ci,
-#                   global_freq=av_ci_width_global_freq_ci,
-#                   forest=av_ci_width_forest), ylab='interval widths')
+par(mfrow=c(1,2))
+boxplot(data.frame(global=av_coverage_global_ci,
+                   local=av_coverage_local_ci,
+                   global_freq=av_coverage_global_freq_ci,
+                   forest=av_coverage_forest), ylab='coverage')
+boxplot(data.frame(global=av_ci_width_global_ci,
+                   local=av_ci_width_local_ci,
+                   global_freq=av_ci_width_global_freq_ci,
+                   forest=av_ci_width_forest), ylab='interval widths')
 
-ggplot(df, aes(x, y)) + 
-  geom_point() +
-  geom_abline(intercept=reg_model$coefficients[1], slope=reg_model$coefficients[2]) +
-  geom_smooth(method='lm', level=0.95) + 
-  ggtitle(paste0("R2 = ", round(summary(reg_model)$adj.r.squared, 2))) +
-  geom_abline(intercept=intercept - err_bottom, slope=slope, col='red') +
-  geom_abline(intercept=intercept + delta_ci*err_top, slope=slope, col='purple') +
-  geom_abline(intercept=intercept - delta_ci*err_bottom, slope=slope, col='purple') +
-  geom_abline(intercept=intercept + err_top, slope=slope, col='red') +
-  geom_ribbon(aes(ymin=slope*x + intercept - err_bottom, ymax=slope*x + intercept + err_top), 
-              fill='yellow', alpha=0.25) +
-  geom_ribbon(aes(ymin=slope*x + intercept - delta_ci*err_bottom, 
-                  ymax=slope*x + intercept + delta_ci*err_top), 
-              fill='cadetblue1', alpha=0.25) +
-  theme_bw()
+
 
 
 
