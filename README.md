@@ -13,19 +13,19 @@ names(df) <- c("y", "x")
 ## Possibilistic linear regression
 
 ``` r
-soft_lm <- possibilistic_linear_regression(x=df$x, y=df$y, do_plot=T)
+library(devtools)
 ```
 
-    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-    ## ℹ Please use `linewidth` instead.
-    ## This warning is displayed once every 8 hours.
-    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-    ## generated.
-
-    ## Warning in geom_abline(intercept = intercept, slope = slope, col = "red", :
-    ## Ignoring unknown parameters: `xmin`
+    ## Loading required package: usethis
 
 ``` r
+source_url("https://raw.githubusercontent.com/sutton-charani/possibilistic_linear_regression/main/code/my_lib_possibilistic_linear_regression.R")
+```
+
+    ## ℹ SHA-1 hash of file is "73c64534f24f6585533a221f77299c251fc81a72"
+
+``` r
+soft_lm <- possibilistic_linear_regression(x=df$x, y=df$y, do_plot=T)
 soft_lm
 ```
 
@@ -55,12 +55,6 @@ soft_lm
 
 ``` r
 soft_lm <- possibilistic_linear_regression(x=df$x, y=df$y, do_plot=T, confidences=seq(from=0.5, to=0.99, length.out=4))
-```
-
-    ## Warning in geom_abline(intercept = intercept, slope = slope, col = "red", :
-    ## Ignoring unknown parameters: `xmin`
-
-``` r
 soft_lm
 ```
 
