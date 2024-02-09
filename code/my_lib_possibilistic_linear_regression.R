@@ -32,7 +32,7 @@ empirical_conf_int <- function(x, y, confidence=0.95){
   return(result)
 }
 ################################
-imprecise_regression <- function(x, y, confidences=c(0.7, 0.8, 0.95), do_plot=F, size=1){
+possibilistic_linear_regression <- function(x, y, confidences=c(0.7, 0.8, 0.95), do_plot=F, size=1){
   intercept_interval <- data.frame()
   slope_interval <- data.frame()
   for (confidence in confidences){
