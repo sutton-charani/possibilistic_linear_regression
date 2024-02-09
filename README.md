@@ -14,17 +14,9 @@ names(df) <- c("y", "x")
 
 ``` r
 library(devtools)
-```
+source_url("https://raw.githubusercontent.com/sutton-charani/possibilistic_linear_regression/main/code/my_lib_possibilistic_linear_regression.R",
+           sha1="73c64534f24f6585533a221f77299c251fc81a72")
 
-    ## Loading required package: usethis
-
-``` r
-source_url("https://raw.githubusercontent.com/sutton-charani/possibilistic_linear_regression/main/code/my_lib_possibilistic_linear_regression.R")
-```
-
-    ## ℹ SHA-1 hash of file is "73c64534f24f6585533a221f77299c251fc81a72"
-
-``` r
 soft_lm <- possibilistic_linear_regression(x=df$x, y=df$y, do_plot=T)
 soft_lm
 ```
