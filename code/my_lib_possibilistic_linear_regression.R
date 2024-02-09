@@ -59,7 +59,7 @@ possibilistic_linear_regression <- function(x, y, confidences=c(0.7, 0.8, 0.95),
     err_bottom <- max(predict(reg_model, dataframe) - dataframe$y)
     p <- ggplot(dataframe, aes(x, y)) + 
       geom_point() +
-      geom_abline(intercept=intercept, slope=slope, col="red", size=size, xmin=0) +
+      geom_abline(intercept=intercept, slope=slope, col="red", linewidth=size) +
       geom_ribbon(aes(ymin=slope*x + intercept_interval$intercept_min[1], ymax=slope*x + intercept_interval$intercept_max[1]), 
                   fill=colorAccording2(intercept_interval$mass, gradTy='gray.colorsW')[1], alpha=0.25, show.legend = F) +
       geom_ribbon(aes(ymin=slope*x + intercept_interval$intercept_min[2], ymax=slope*x + intercept_interval$intercept_max[2]),
