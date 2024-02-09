@@ -51,7 +51,7 @@ soft_lm
     ## 
     ## $plot
 
-(README_files/figure-gfm/possibilistic_linear_regression_1st_example-1.png)<!-- -->
+![](possibilistic_linear_regression_1st_example-1.png)<!-- -->
 
 ``` r
 soft_lm <- possibilistic_linear_regression(x=df$x, y=df$y, do_plot=T, confidences=seq(from=0.5, to=0.99, length.out=4))
@@ -88,4 +88,4 @@ soft_lm
     ## 
     ## $plot
 
-(README_files/figure-gfm/possibilistic_linear_regression_2nd_example-1.png)<!-- -->
+![](possibilistic_linear_regression_2nd_example-1.png)<!-- -->
