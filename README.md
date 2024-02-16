@@ -1,24 +1,104 @@
 README
 ================
-Nicolas Sutton-Charani
+Nicolas Sutton-Charani & Francis Faux
 2024-02-09
 
-## Data definition
+#### Data definition
 
 ``` r
-df <- iris[c("Petal.Length", "Petal.Width")] # "Petal.Length", "Sepal.Length"
+df <- iris[c("Petal.Length", "Petal.Width")]
 names(df) <- c("y", "x")
 ```
 
-## Possibilistic linear regression
+#### Possibilistic linear regression
 
 ``` r
-library(devtools)
-source_url("https://raw.githubusercontent.com/sutton-charani/possibilistic_linear_regression/main/code/my_lib_possibilistic_linear_regression.R",
-           sha1="73c64534f24f6585533a221f77299c251fc81a72")
+devtools::source_url(paste0("https://raw.githubusercontent.com/sutton-charani/",
+                            "possibilistic_linear_regression/",
+                            "main/code/my_lib_possibilistic_linear_regression.R"),
+                     sha1="701008dc6020d940d1fd11adce67f10d091378c3")
+```
 
-soft_lm <- possibilistic_linear_regression(x=df$x, y=df$y, do_plot=T)
-soft_lm
+``` r
+empirical_conf_int(df$x, df$y, confidence=0.95, do_plot=T)
+```
+
+    ## $intercept
+    ## [1] 1.083558
+    ## 
+    ## $intercept_min
+    ## [1] 0.09938528
+    ## 
+    ## $intercept_max
+    ## [1] 1.980412
+    ## 
+    ## $slope
+    ## [1] 2.22994
+    ## 
+    ## $slope_min
+    ## [1] 1.481119
+    ## 
+    ## $slope_max
+    ## [1] 3.048641
+    ## 
+    ## $plot
+
+![](README_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
+
+``` r
+empirical_conf_int(df$x, df$y, confidence=0.5, do_plot=T)
+```
+
+    ## $intercept
+    ## [1] 1.083558
+    ## 
+    ## $intercept_min
+    ## [1] 0.7648992
+    ## 
+    ## $intercept_max
+    ## [1] 1.359801
+    ## 
+    ## $slope
+    ## [1] 2.22994
+    ## 
+    ## $slope_min
+    ## [1] 1.962976
+    ## 
+    ## $slope_max
+    ## [1] 2.503796
+    ## 
+    ## $plot
+
+![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+``` r
+empirical_conf_int(df$x, df$y, confidence=0.1, do_plot=T)
+```
+
+    ## $intercept
+    ## [1] 1.083558
+    ## 
+    ## $intercept_min
+    ## [1] 1.001873
+    ## 
+    ## $intercept_max
+    ## [1] 1.098947
+    ## 
+    ## $slope
+    ## [1] 2.22994
+    ## 
+    ## $slope_min
+    ## [1] 2.200346
+    ## 
+    ## $slope_max
+    ## [1] 2.314551
+    ## 
+    ## $plot
+
+![](README_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+``` r
+possibilistic_linear_regression(x=df$x, y=df$y, do_plot=T, confidences=c(0.1, 0.50, .95))
 ```
 
     ## $precise_slope
@@ -29,49 +109,18 @@ soft_lm
     ## 
     ## $slope_possibility
     ##   slope_min slope_max        mass
-    ## 1  1.831824  2.628057 0.284933752
-    ## 2  1.729451  2.730430 0.325638574
-    ## 3  1.376834  3.083047 0.386695807
+    ## 1  2.200346  2.314551 0.064237982
+    ## 2  1.962976  2.503796 0.321189912
+    ## 3  1.481119  3.048641 0.610260832
     ## 4      -Inf       Inf 0.006711409
     ## 
     ## $intercept_possibility
     ##   intercept_min intercept_max        mass
-    ## 1    0.61616271      1.571642 0.284933752
-    ## 2    0.49597534      1.697149 0.325638574
-    ## 3    0.08199662      2.129452 0.386695807
+    ## 1    1.00187302      1.098947 0.064237982
+    ## 2    0.76489920      1.359801 0.321189912
+    ## 3    0.09938528      1.980412 0.610260832
     ## 4          -Inf           Inf 0.006711409
     ## 
     ## $plot
 
-![](README_files/figure-gfm/possibilistic_linear_regression_1st_example-1.png)<!-- -->
-
-``` r
-soft_lm <- possibilistic_linear_regression(x=df$x, y=df$y, do_plot=T, confidences=seq(from=0.5, to=0.99, length.out=4))
-soft_lm
-```
-
-    ## $precise_slope
-    ## [1] 2.22994
-    ## 
-    ## $precise_intercept
-    ## [1] 1.083558
-    ## 
-    ## $slope_possibility
-    ##   slope_min slope_max        mass
-    ## 1  1.968321  2.491560 0.167408206
-    ## 2  1.865948  2.593933 0.222094887
-    ## 3  1.672578  2.787303 0.276781568
-    ## 4  1.092465  3.367416 0.331468249
-    ## 5      -Inf       Inf 0.006711409
-    ## 
-    ## $intercept_possibility
-    ##   intercept_min intercept_max        mass
-    ## 1     0.7764125      1.404299 0.167408206
-    ## 2     0.6562252      1.529806 0.222094887
-    ## 3     0.4292046      1.766875 0.276781568
-    ## 4    -0.2518572      2.478083 0.331468249
-    ## 5          -Inf           Inf 0.006711409
-    ## 
-    ## $plot
-
-![](README_files/figure-gfm/possibilistic_linear_regression_2nd_example-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
