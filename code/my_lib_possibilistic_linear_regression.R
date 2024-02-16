@@ -53,6 +53,8 @@ empirical_conf_int <- function(x, y, confidence=0.95, do_plot=F){
                   fill='cadetblue1', alpha=0.25) +
       theme_bw() +
       theme(text = element_text(size = 30), plot.title = element_text(hjust = 0.5))
+  } else {
+    p <- NULL
   }
   
   
