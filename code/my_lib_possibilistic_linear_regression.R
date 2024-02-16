@@ -1,7 +1,7 @@
 library(ggplot2); library(wrMisc)
 
 ################################
-empirical_conf_int <- function(x, y, confidence=0.95){
+empirical_conf_int <- function(x, y, confidence=0.95, do_plot=F){
   dataframe <- data.frame(x=x, y=y)
   reg_model <- lm(y~x, dataframe)
   
@@ -10,33 +10,62 @@ empirical_conf_int <- function(x, y, confidence=0.95){
   err_top <- max(y - predict(reg_model, dataframe))
   err_bottom <- max(predict(reg_model, dataframe) - y)
   
-  deltas <- seq(from=0, to=1, by=0.01)
-  misclassified_proportion <- c()
-  for (delta in deltas){
-    n_misclassified <- nrow(dataframe[y > x * slope + intercept + delta*err_top | 
-                                        y < x * slope + intercept - delta*err_bottom, ])
-    misclassified_proportion <- c(misclassified_proportion, n_misclassified/nrow(dataframe))
+  df$d <- abs(df$y - slope*df$x- intercept)
+  df <- df[order(df$d, decreasing=F), ]
+  irow_max <- floor(confidence * nrow(df))
+  df_conf <- df[1 : irow_max, ]
+  reg_model_conf <- lm(y~x, df_conf)
+  slope_conf <- reg_model_conf$coefficients[['x']]
+  intercept_conf <- reg_model_conf$coefficients[['(Intercept)']]
+  
+  intercept_min <- intercept_conf - max(df_conf$d)
+  intercept_max <- intercept_conf + max(df_conf$d)
+  slope_min <- (slope_conf*(max(df_conf$x) - min(df_conf$x)) + intercept_min - intercept_max) / 
+    (max(df_conf$x) - min(df_conf$x))
+  slope_max <- (slope_conf*(min(df_conf$x) - max(df_conf$x)) + intercept_min - intercept_max) / 
+    (min(df_conf$x) - max(df_conf$x))
+  
+  if (do_plot){
+    p <- ggplot(df, aes(x, y)) + 
+      geom_point() +
+      geom_abline(intercept=reg_model_conf$coefficients[1], slope=reg_model_conf$coefficients[2], color='red') +
+      ggtitle(paste0("Evidential band \nfor a confidence of ", confidence)) +
+      geom_segment(aes(x=min(df$x), y=slope_conf*min(df$x)+intercept_min,
+                       xend=min(df$x), yend=slope_conf*min(df$x)+intercept_max),
+                   linetype = "dashed", col='purple') +
+      geom_segment(aes(x=max(df$x), y=slope_conf*max(df$x)+intercept_min,
+                       xend=max(df$x), yend=slope_conf*max(df$x)+intercept_max),
+                   linetype = "dashed", col='purple') +
+      geom_segment(aes(x=min(df$x), y=slope_conf*min(df$x)+intercept_max,
+                       xend=max(df$x), yend=slope_conf*max(df$x)+intercept_max),
+                   linetype = "dashed", col='purple') +
+      geom_segment(aes(x=min(df$x), y=slope_min*min(df$x)+slope_conf*min(df$x)+intercept_max-slope_min*min(df$x),
+                       xend=max(df$x), yend=slope_conf*max(df$x)+intercept_min),
+                   col='blue') +
+      geom_segment(aes(x=min(df$x), y=slope_conf*min(df$x)+intercept_min,
+                       xend=max(df$x), yend=slope_max*max(df$x)+slope_conf*max(df$x)+intercept_max-slope_max*max(df$x)),
+                   col='blue') +
+      geom_segment(aes(x=min(df$x), y=slope_conf*min(df$x)+intercept_min,
+                       xend=max(df$x), yend=slope_conf*max(df$x)+intercept_min),
+                   linetype = "dashed", col='purple') +
+      geom_ribbon(aes(ymin=slope_conf*x + intercept_min,
+                      ymax=slope_conf*x + intercept_max),
+                  fill='cadetblue1', alpha=0.25) +
+      theme_bw() +
+      theme(text = element_text(size = 30), plot.title = element_text(hjust = 0.5))
   }
-  names(misclassified_proportion) <- deltas
-  misclassified_proportion <- misclassified_proportion[order(misclassified_proportion)]
-  alpha <- 1 - confidence # = risk level -> confidence level = 1 - alpha
-  delta_ci <- as.numeric(names(tail(misclassified_proportion[misclassified_proportion < alpha], 1)))
   
-  intercept_min <- intercept-err_bottom*delta_ci
-  intercept_max <- intercept+err_top*delta_ci
-  slope_min <- (intercept_max - intercept_min + slope*(min(x) - max(x))) / (min(x) - max(x))
-  slope_max <- (intercept_min - intercept_max + slope*(min(x) - max(x))) / (min(x) - max(x))
   
-  result <- list(intercept_min=intercept_min,intercept_max=intercept_max, 
-                 slope_min=slope_min,slope_max=slope_max)
+  result <- list(intercept=intercept, intercept_min=intercept_min,intercept_max=intercept_max, 
+                 slope=slope, slope_min=slope_min,slope_max=slope_max, plot=p)
   return(result)
 }
 ################################
-possibilistic_linear_regression <- function(x, y, confidences=c(0.7, 0.8, 0.95), do_plot=F, size=1){
+possibilistic_linear_regression <- function(x, y, confidences=c(0.5, 0.75, 0.95), do_plot=F, size=1){
   intercept_interval <- data.frame()
   slope_interval <- data.frame()
   for (confidence in confidences){
-    soft_regression_intervals <- empirical_conf_int(x, y, confidence=confidence)
+    soft_regression_intervals <- empirical_conf_int(x, y, confidence=confidence, do_plot=F)
     intercept_interval <- rbind(intercept_interval, unlist(soft_regression_intervals[c('intercept_min', 'intercept_max')]))
     slope_interval <- rbind(slope_interval, unlist(soft_regression_intervals[c('slope_min', 'slope_max')]))
   }
