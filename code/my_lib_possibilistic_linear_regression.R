@@ -10,10 +10,10 @@ empirical_conf_int <- function(x, y, confidence=0.95, do_plot=F){
   err_top <- max(y - predict(reg_model, dataframe))
   err_bottom <- max(predict(reg_model, dataframe) - y)
   
-  df$d <- abs(df$y - slope*df$x- intercept)
-  df <- df[order(df$d, decreasing=F), ]
-  irow_max <- floor(confidence * nrow(df))
-  df_conf <- df[1 : irow_max, ]
+  dataframe$d <- abs(dataframe$y - slope*dataframe$x- intercept)
+  dataframe <- dataframe[order(dataframe$d, decreasing=F), ]
+  irow_max <- floor(confidence * nrow(dataframe))
+  df_conf <- dataframe[1 : irow_max, ]
   reg_model_conf <- lm(y~x, df_conf)
   slope_conf <- reg_model_conf$coefficients[['x']]
   intercept_conf <- reg_model_conf$coefficients[['(Intercept)']]
@@ -30,23 +30,23 @@ empirical_conf_int <- function(x, y, confidence=0.95, do_plot=F){
       geom_point() +
       geom_abline(intercept=reg_model_conf$coefficients[1], slope=reg_model_conf$coefficients[2], color='red') +
       ggtitle(paste0("Evidential band \nfor a confidence of ", confidence)) +
-      geom_segment(aes(x=min(df$x), y=slope_conf*min(df$x)+intercept_min,
-                       xend=min(df$x), yend=slope_conf*min(df$x)+intercept_max),
+      geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_min,
+                       xend=min(dataframe$x), yend=slope_conf*min(dataframe$x)+intercept_max),
                    linetype = "dashed", col='purple') +
-      geom_segment(aes(x=max(df$x), y=slope_conf*max(df$x)+intercept_min,
-                       xend=max(df$x), yend=slope_conf*max(df$x)+intercept_max),
+      geom_segment(aes(x=max(dataframe$x), y=slope_conf*max(dataframe$x)+intercept_min,
+                       xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_max),
                    linetype = "dashed", col='purple') +
-      geom_segment(aes(x=min(df$x), y=slope_conf*min(df$x)+intercept_max,
-                       xend=max(df$x), yend=slope_conf*max(df$x)+intercept_max),
+      geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_max,
+                       xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_max),
                    linetype = "dashed", col='purple') +
-      geom_segment(aes(x=min(df$x), y=slope_min*min(df$x)+slope_conf*min(df$x)+intercept_max-slope_min*min(df$x),
-                       xend=max(df$x), yend=slope_conf*max(df$x)+intercept_min),
+      geom_segment(aes(x=min(dataframe$x), y=slope_min*min(dataframe$x)+slope_conf*min(dataframe$x)+intercept_max-slope_min*min(dataframe$x),
+                       xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_min),
                    col='blue') +
-      geom_segment(aes(x=min(df$x), y=slope_conf*min(df$x)+intercept_min,
-                       xend=max(df$x), yend=slope_max*max(df$x)+slope_conf*max(df$x)+intercept_max-slope_max*max(df$x)),
+      geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_min,
+                       xend=max(dataframe$x), yend=slope_max*max(dataframe$x)+slope_conf*max(dataframe$x)+intercept_max-slope_max*max(dataframe$x)),
                    col='blue') +
-      geom_segment(aes(x=min(df$x), y=slope_conf*min(df$x)+intercept_min,
-                       xend=max(df$x), yend=slope_conf*max(df$x)+intercept_min),
+      geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_min,
+                       xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_min),
                    linetype = "dashed", col='purple') +
       geom_ribbon(aes(ymin=slope_conf*x + intercept_min,
                       ymax=slope_conf*x + intercept_max),
@@ -64,6 +64,11 @@ empirical_conf_int <- function(x, y, confidence=0.95, do_plot=F){
 }
 ################################
 possibilistic_linear_regression <- function(x, y, confidences=c(0.5, 0.75, 0.95), do_plot=F, size=1){
+  
+  precise_reg_model <- lm(y~x, data.frame(x=x, y=y))
+  precise_slope <- precise_reg_model$coefficients[['x']]
+  precise_intercept <- precise_reg_model$coefficients[['(Intercept)']]
+  
   intercept_interval <- data.frame()
   slope_interval <- data.frame()
   for (confidence in confidences){
@@ -109,7 +114,7 @@ possibilistic_linear_regression <- function(x, y, confidences=c(0.5, 0.75, 0.95)
     p <- NULL
   }
   
-  result <- list(precise_slope=slope, precise_intercept=intercept, 
+  result <- list(precise_slope=precise_slope, precise_intercept=precise_intercept, 
                  slope_possibility=slope_interval, intercept_possibility=intercept_interval, 
                  plot=p)
   return(result)
