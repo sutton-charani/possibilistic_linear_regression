@@ -26,7 +26,7 @@ empirical_conf_int <- function(x, y, confidence=0.95, do_plot=F){
     (min(df_conf$x) - max(df_conf$x))
   
   if (do_plot){
-    p <- ggplot(df, aes(x, y)) + 
+    p <- ggplot(dataframe, aes(x, y)) + 
       geom_point() +
       geom_abline(intercept=reg_model_conf$coefficients[1], slope=reg_model_conf$coefficients[2], color='red') +
       ggtitle(paste0("Evidential band \nfor a confidence of ", confidence)) +
