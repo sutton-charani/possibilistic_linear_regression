@@ -58,8 +58,8 @@ empirical_conf_int <- function(x, y, confidence=0.95, do_plot=F){
   }
   
   
-  result <- list(intercept=intercept, intercept_min=intercept_min,intercept_max=intercept_max, 
-                 slope=slope, slope_min=slope_min,slope_max=slope_max, plot=p)
+  result <- list(intercept=intercept_conf, intercept_min=intercept_min,intercept_max=intercept_max, 
+                 slope=slope_conf, slope_min=slope_min,slope_max=slope_max, plot=p)
   return(result)
 }
 ################################
