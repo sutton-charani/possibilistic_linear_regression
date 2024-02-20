@@ -133,7 +133,7 @@ empirical_conf_int <- function(x, y, confidence=0.95, do_plot=F, band_slope=T, b
   return(result)
 }
 ################################
-possibilistic_linear_regression <- function(x, y, confidences=c(0.5, 0.75, 0.95), do_plot=F, size=1){
+possibilistic_linear_regression <- function(x, y, initial_confidences=c(0.5, 0.75, 0.95), do_plot=F, size=1){
   
   precise_reg_model <- lm(y~x, data.frame(x=x, y=y))
   precise_slope <- precise_reg_model$coefficients[['x']]
@@ -143,7 +143,7 @@ possibilistic_linear_regression <- function(x, y, confidences=c(0.5, 0.75, 0.95)
   slope_interval <- data.frame()
   slope_confs <- c()
   intercept_confs <- c()
-  for (confidence in confidences){
+  for (confidence in initial_confidences){
     soft_regression_intervals <- empirical_conf_int(x, y, confidence=confidence, do_plot=F)
     intercept_interval <- rbind(intercept_interval, unlist(soft_regression_intervals[c('intercept_min', 'intercept_max')]))
     slope_interval <- rbind(slope_interval, unlist(soft_regression_intervals[c('slope_min', 'slope_max')]))
@@ -154,7 +154,7 @@ possibilistic_linear_regression <- function(x, y, confidences=c(0.5, 0.75, 0.95)
   intercept_interval <- rbind(intercept_interval, c(-Inf, +Inf))
   slope_interval <- rbind(slope_interval, c(-Inf, +Inf))
   mass_omega <- 1/(length(x) - 1) # Shafer uncertainty model
-  confidences <- confidences/(sum(confidences) + mass_omega)
+  confidences <- initial_confidences/(sum(initial_confidences) + mass_omega)
   names(intercept_interval) <- c("intercept_min", "intercept_max")
   names(slope_interval) <- c("slope_min", "slope_max")
   intercept_interval$mass <- c(confidences, mass_omega)
@@ -166,12 +166,20 @@ possibilistic_linear_regression <- function(x, y, confidences=c(0.5, 0.75, 0.95)
     slope <- reg_model$coefficients[['x']]
     intercept <- reg_model$coefficients[['(Intercept)']]
     
+    if (length(initial_confidences) < 6){
+      plot_title <- paste("Possibilistic regression for\nbelief degrees =", 
+                     paste(initial_confidences, collapse=", "))
+    } else {
+      plot_title <- paste("Possibilistic regression for\nbelief degrees =", 
+                          initial_confidences[1], ",", initial_confidences[2],
+                          ", ... ,", initial_confidences[length(initial_confidences)])
+    }
     p <- ggplot(dataframe, aes(x, y)) + 
-      ggtitle("Possibilistic regression") +
+      ggtitle(plot_title) +
       theme_bw() + xlab("Petal.Length") + ylab("Sepal.Width") +
       theme(text = element_text(size = 30),
             plot.title = element_text(hjust = 0.5))
-    for (i in seq(from=length(confidences), to=1, by=-1)){
+    for (i in seq(from=length(initial_confidences), to=1, by=-1)){
       command_line <- paste0("p <- p + geom_evid_band(intercept_confs[", i,
                              "], intercept_interval$intercept_min[", i,
                              "], intercept_interval$intercept_max[", i,
@@ -207,4 +215,3 @@ possibilistic_linear_regression <- function(x, y, confidences=c(0.5, 0.75, 0.95)
 
 
 
-###############
