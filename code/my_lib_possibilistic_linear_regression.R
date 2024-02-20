@@ -91,7 +91,7 @@ geom_evid_band <- function(intercept_conf, intercept_min, intercept_max, slope_c
   }
 } 
 ################################
-empirical_conf_int <- function(x, y, confidence=0.95, do_plot=F, band_slope=T, band_diags=T, band_border_type="dashed"){
+empirical_conf_int <- function(x, y, confidence=0.95, do_plot=F, band_slope=T, band_diags=T, band_border_type="dashed", size=25){
   dataframe <- data.frame(x=x, y=y)
   reg_model <- lm(y~x, dataframe)
   
@@ -120,7 +120,7 @@ empirical_conf_int <- function(x, y, confidence=0.95, do_plot=F, band_slope=T, b
       geom_point() +
       ggtitle(paste0("Evidential band \nfor a confidence of ", confidence)) +
       theme_bw() +
-      theme(text = element_text(size = 30), plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(size = size), plot.title = element_text(hjust = 0.5)) +
       geom_evid_band(intercept_conf, intercept_min, intercept_max, slope_conf, slope_min, slope_max, dataframe, 
                      band_slope=band_slope, band_diags=band_diags, band_border_type=band_border_type)
   } else {
@@ -133,7 +133,7 @@ empirical_conf_int <- function(x, y, confidence=0.95, do_plot=F, band_slope=T, b
   return(result)
 }
 ################################
-possibilistic_linear_regression <- function(x, y, initial_confidences=c(0.5, 0.75, 0.95), do_plot=F, size=1){
+possibilistic_linear_regression <- function(x, y, initial_confidences=c(0.5, 0.75, 0.95), do_plot=F, size=25){
   
   precise_reg_model <- lm(y~x, data.frame(x=x, y=y))
   precise_slope <- precise_reg_model$coefficients[['x']]
@@ -172,12 +172,13 @@ possibilistic_linear_regression <- function(x, y, initial_confidences=c(0.5, 0.7
     } else {
       plot_title <- paste("Possibilistic regression for\nbelief degrees =", 
                           initial_confidences[1], ",", initial_confidences[2],
-                          ", ... ,", initial_confidences[length(initial_confidences)])
+                          ", ... ,", initial_confidences[length(initial_confidences) - 1], ", "
+                          initial_confidences[length(initial_confidences)])
     }
     p <- ggplot(dataframe, aes(x, y)) + 
       ggtitle(plot_title) +
       theme_bw() + xlab("Petal.Length") + ylab("Sepal.Width") +
-      theme(text = element_text(size = 30),
+      theme(text = element_text(size = size),
             plot.title = element_text(hjust = 0.5))
     for (i in seq(from=length(initial_confidences), to=1, by=-1)){
       command_line <- paste0("p <- p + geom_evid_band(intercept_confs[", i,
@@ -191,7 +192,7 @@ possibilistic_linear_regression <- function(x, y, initial_confidences=c(0.5, 0.7
       eval(parse(text=command_line))
     }
     p <- p + geom_point() +
-      geom_abline(intercept=intercept, slope=slope, col="red", linewidth=size)
+      geom_abline(intercept=intercept, slope=slope, col="red", linewidth=1)
     
   } else {
     p <- NULL
