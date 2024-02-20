@@ -118,7 +118,7 @@ empirical_conf_int <- function(x, y, confidence=0.95, do_plot=F, band_slope=T, b
   if (do_plot){
     p <- ggplot(dataframe, aes(x, y)) + 
       geom_point() +
-      ggtitle(paste0("Evidential band \nfor a confidence of ", confidence)) +
+      ggtitle(paste0("Evidential band \nfor a belief degree of ", confidence)) +
       theme_bw() +
       theme(text = element_text(size = size), plot.title = element_text(hjust = 0.5)) +
       geom_evid_band(intercept_conf, intercept_min, intercept_max, slope_conf, slope_min, slope_max, dataframe, 
