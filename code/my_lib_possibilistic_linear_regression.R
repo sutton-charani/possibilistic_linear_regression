@@ -172,7 +172,7 @@ possibilistic_linear_regression <- function(x, y, initial_confidences=c(0.5, 0.7
     } else {
       plot_title <- paste("Possibilistic regression for\nbelief degrees =", 
                           initial_confidences[1], ",", initial_confidences[2],
-                          ", ... ,", initial_confidences[length(initial_confidences) - 1], ", "
+                          ", ... ,", initial_confidences[length(initial_confidences) - 1], ", ",
                           initial_confidences[length(initial_confidences)])
     }
     p <- ggplot(dataframe, aes(x, y)) + 
