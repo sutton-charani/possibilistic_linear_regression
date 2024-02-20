@@ -1,7 +1,96 @@
 library(ggplot2); library(wrMisc)
-
 ################################
-empirical_conf_int <- function(x, y, confidence=0.95, do_plot=F){
+geom_evid_band <- function(intercept_conf, intercept_min, intercept_max, slope_conf, slope_min, slope_max, dataframe, 
+                           band_slope=T, band_diags=T, band_border_type="dashed", alpha=0.25){
+  band_color <- "black"
+  if (band_slope & band_diags){
+    list(geom_abline(intercept=intercept_conf, slope=slope_conf, color='red'),
+         geom_segment(aes(x=min(dataframe$x), 
+                          y=slope_min*min(dataframe$x)+slope_conf*min(dataframe$x)+intercept_max-slope_min*min(dataframe$x),
+                          xend=max(dataframe$x), 
+                          yend=slope_conf*max(dataframe$x)+intercept_min),
+                      col='blue'),
+         geom_segment(aes(x=min(dataframe$x), 
+                          y=slope_conf*min(dataframe$x)+intercept_min,
+                          xend=max(dataframe$x), 
+                          yend=slope_max*max(dataframe$x)+slope_conf*max(dataframe$x)+intercept_max-slope_max*max(dataframe$x)),
+                      col='blue'),
+         geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_min,
+                          xend=min(dataframe$x), yend=slope_conf*min(dataframe$x)+intercept_max),
+                      linetype = band_border_type, col='purple'),
+         geom_segment(aes(x=max(dataframe$x), y=slope_conf*max(dataframe$x)+intercept_min,
+                          xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_max),
+                      linetype = band_border_type, col='purple'),
+         geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_max,
+                          xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_max),
+                      linetype = band_border_type, col='purple'),
+         geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_min,
+                          xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_min),
+                      linetype = band_border_type, col='purple'),
+         geom_ribbon(aes(ymin=slope_conf*x + intercept_min, ymax=slope_conf*x + intercept_max),
+                     fill=band_color, alpha=alpha))
+  } else {
+    if (band_slope & !band_diags){
+      list(geom_abline(intercept=intercept_conf, slope=slope_conf, color='red'),
+           geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_min,
+                            xend=min(dataframe$x), yend=slope_conf*min(dataframe$x)+intercept_max),
+                        linetype = band_border_type, col='purple'),
+           geom_segment(aes(x=max(dataframe$x), y=slope_conf*max(dataframe$x)+intercept_min,
+                            xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_max),
+                        linetype = band_border_type, col='purple'),
+           geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_max,
+                            xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_max),
+                        linetype = band_border_type, col='purple'),
+           geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_min,
+                            xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_min),
+                        linetype = band_border_type, col='purple'),
+           geom_ribbon(aes(ymin=slope_conf*x + intercept_min, ymax=slope_conf*x + intercept_max),
+                       fill=band_color, alpha=alpha))
+    } else {
+      if (!band_slope & band_diags){
+        list(geom_segment(aes(x=min(dataframe$x), 
+                              y=slope_min*min(dataframe$x)+slope_conf*min(dataframe$x)+intercept_max-slope_min*min(dataframe$x),
+                              xend=max(dataframe$x), 
+                              yend=slope_conf*max(dataframe$x)+intercept_min),
+                          col='blue'),
+             geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_min,
+                              xend=max(dataframe$x), yend=slope_max*max(dataframe$x)+slope_conf*max(dataframe$x)+intercept_max-slope_max*max(dataframe$x)),
+                          col='blue'),
+             geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_min,
+                              xend=min(dataframe$x), yend=slope_conf*min(dataframe$x)+intercept_max),
+                          linetype = band_border_type, col='purple'),
+             geom_segment(aes(x=max(dataframe$x), y=slope_conf*max(dataframe$x)+intercept_min,
+                              xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_max),
+                          linetype = band_border_type, col='purple'),
+             geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_max,
+                              xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_max),
+                          linetype = band_border_type, col='purple'),
+             geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_min,
+                              xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_min),
+                          linetype = band_border_type, col='purple'),
+             geom_ribbon(aes(ymin=slope_conf*x + intercept_min, ymax=slope_conf*x + intercept_max),
+                         fill=band_color, alpha=alpha))
+      } else { # case (!slope & !diags)
+        list(geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_min,
+                              xend=min(dataframe$x), yend=slope_conf*min(dataframe$x)+intercept_max),
+                          linetype = band_border_type, col='purple'),
+             geom_segment(aes(x=max(dataframe$x), y=slope_conf*max(dataframe$x)+intercept_min,
+                              xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_max),
+                          linetype = band_border_type, col='purple'),
+             geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_max,
+                              xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_max),
+                          linetype = band_border_type, col='purple'),
+             geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_min,
+                              xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_min),
+                          linetype = band_border_type, col='purple'),
+             geom_ribbon(aes(ymin=slope_conf*x + intercept_min, ymax=slope_conf*x + intercept_max),
+                         fill=band_color, alpha=alpha))
+      }
+    }
+  }
+} 
+################################
+empirical_conf_int <- function(x, y, confidence=0.95, do_plot=F, band_slope=T, band_diags=T, band_border_type="dashed"){
   dataframe <- data.frame(x=x, y=y)
   reg_model <- lm(y~x, dataframe)
   
@@ -28,31 +117,11 @@ empirical_conf_int <- function(x, y, confidence=0.95, do_plot=F){
   if (do_plot){
     p <- ggplot(dataframe, aes(x, y)) + 
       geom_point() +
-      geom_abline(intercept=reg_model_conf$coefficients[1], slope=reg_model_conf$coefficients[2], color='red') +
       ggtitle(paste0("Evidential band \nfor a confidence of ", confidence)) +
-      geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_min,
-                       xend=min(dataframe$x), yend=slope_conf*min(dataframe$x)+intercept_max),
-                   linetype = "dashed", col='purple') +
-      geom_segment(aes(x=max(dataframe$x), y=slope_conf*max(dataframe$x)+intercept_min,
-                       xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_max),
-                   linetype = "dashed", col='purple') +
-      geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_max,
-                       xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_max),
-                   linetype = "dashed", col='purple') +
-      geom_segment(aes(x=min(dataframe$x), y=slope_min*min(dataframe$x)+slope_conf*min(dataframe$x)+intercept_max-slope_min*min(dataframe$x),
-                       xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_min),
-                   col='blue') +
-      geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_min,
-                       xend=max(dataframe$x), yend=slope_max*max(dataframe$x)+slope_conf*max(dataframe$x)+intercept_max-slope_max*max(dataframe$x)),
-                   col='blue') +
-      geom_segment(aes(x=min(dataframe$x), y=slope_conf*min(dataframe$x)+intercept_min,
-                       xend=max(dataframe$x), yend=slope_conf*max(dataframe$x)+intercept_min),
-                   linetype = "dashed", col='purple') +
-      geom_ribbon(aes(ymin=slope_conf*x + intercept_min,
-                      ymax=slope_conf*x + intercept_max),
-                  fill='cadetblue1', alpha=0.25) +
       theme_bw() +
-      theme(text = element_text(size = 30), plot.title = element_text(hjust = 0.5))
+      theme(text = element_text(size = 30), plot.title = element_text(hjust = 0.5)) +
+      geom_evid_band(intercept_conf, intercept_min, intercept_max, slope_conf, slope_min, slope_max, dataframe, 
+                     band_slope=band_slope, band_diags=band_diags, band_border_type=band_border_type)
   } else {
     p <- NULL
   }
@@ -71,10 +140,14 @@ possibilistic_linear_regression <- function(x, y, confidences=c(0.5, 0.75, 0.95)
   
   intercept_interval <- data.frame()
   slope_interval <- data.frame()
+  slope_confs <- c()
+  intercept_confs <- c()
   for (confidence in confidences){
     soft_regression_intervals <- empirical_conf_int(x, y, confidence=confidence, do_plot=F)
     intercept_interval <- rbind(intercept_interval, unlist(soft_regression_intervals[c('intercept_min', 'intercept_max')]))
     slope_interval <- rbind(slope_interval, unlist(soft_regression_intervals[c('slope_min', 'slope_max')]))
+    slope_confs <- c(slope_confs, soft_regression_intervals$slope)
+    intercept_confs <- c(intercept_confs, soft_regression_intervals$intercept)
   }
   
   intercept_interval <- rbind(intercept_interval, c(-Inf, +Inf))
@@ -91,31 +164,40 @@ possibilistic_linear_regression <- function(x, y, confidences=c(0.5, 0.75, 0.95)
     reg_model <- lm(y~x, dataframe)
     slope <- reg_model$coefficients[['x']]
     intercept <- reg_model$coefficients[['(Intercept)']]
-    err_top <- max(dataframe$y - predict(reg_model, dataframe))
-    err_bottom <- max(predict(reg_model, dataframe) - dataframe$y)
+    
+    masses <- slope_interval$mass[1 : eval(nrow(slope_interval) - 1)]
+    #alphas <- masses[-length(masses)]
+    # alphas <- masses * 1/max(masses)
+    # alphas <- 1 - alphas
+    # alphas <- alphas + 1 - alphas[1]
+    alphas <- masses[order(masses, decreasing = T)]
+
     p <- ggplot(dataframe, aes(x, y)) + 
-      geom_point() +
-      geom_abline(intercept=intercept, slope=slope, col="red", linewidth=size) +
-      geom_ribbon(aes(ymin=slope*x + intercept_interval$intercept_min[1], ymax=slope*x + intercept_interval$intercept_max[1]), 
-                  fill=colorAccording2(intercept_interval$mass, gradTy='gray.colorsW')[1], alpha=0.25, show.legend = F) +
-      geom_ribbon(aes(ymin=slope*x + intercept_interval$intercept_min[2], ymax=slope*x + intercept_interval$intercept_max[2]),
-                  fill=colorAccording2(intercept_interval$mass, gradTy='gray.colorsW')[2], alpha=0.25, show.legend = F) +
-      geom_ribbon(aes(ymin=slope*x + intercept_interval$intercept_min[3], ymax=slope*x + intercept_interval$intercept_max[3]),
-                  fill=colorAccording2(intercept_interval$mass, gradTy='gray.colorsW')[3], alpha=0.25, show.legend = F) +
-      geom_ribbon(aes(ymin=slope*x + intercept_interval$intercept_min[4], ymax=slope*x + intercept_interval$intercept_max[4]),
-                  fill=colorAccording2(intercept_interval$mass, gradTy='gray.colorsW')[4], alpha=0.25, show.legend = F) +
       ggtitle("Possibilistic regression") +
       theme_bw() + xlab("Petal.Length") + ylab("Sepal.Width") +
       theme(text = element_text(size = 30),
-            plot.title = element_text(hjust = 0.5)
-            )
-    p
+            plot.title = element_text(hjust = 0.5))
+    for (i in seq(from=length(confidences), to=1, by=-1)){
+      command_line <- paste0("p <- p + geom_evid_band(intercept_confs[", i,
+                             "], intercept_interval$intercept_min[", i,
+                             "], intercept_interval$intercept_max[", i,
+                             "], slope_confs[", i,
+                             "], slope_interval$slope_min[", i,
+                             "], slope_interval$slope_max[", i,
+                             "], dataframe, band_slope=F, band_diags=F, band_border_type=NA, alpha=alphas[", i,
+                             "])")
+      eval(parse(text=command_line))
+    }
+    p <- p + geom_point() +
+      geom_abline(intercept=intercept, slope=slope, col="red", linewidth=size)
+    
   } else {
     p <- NULL
   }
   
   result <- list(precise_slope=precise_slope, precise_intercept=precise_intercept, 
                  slope_possibility=slope_interval, intercept_possibility=intercept_interval, 
+                 slope_confs=slope_confs,
                  plot=p)
   return(result)
 }
