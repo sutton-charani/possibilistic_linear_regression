@@ -166,13 +166,6 @@ possibilistic_linear_regression <- function(x, y, confidences=c(0.5, 0.75, 0.95)
     slope <- reg_model$coefficients[['x']]
     intercept <- reg_model$coefficients[['(Intercept)']]
     
-    masses <- slope_interval$mass[1 : eval(nrow(slope_interval) - 1)]
-    #alphas <- masses[-length(masses)]
-    # alphas <- masses * 1/max(masses)
-    # alphas <- 1 - alphas
-    # alphas <- alphas + 1 - alphas[1]
-    alphas <- masses[order(masses, decreasing = T)]
-
     p <- ggplot(dataframe, aes(x, y)) + 
       ggtitle("Possibilistic regression") +
       theme_bw() + xlab("Petal.Length") + ylab("Sepal.Width") +
@@ -185,7 +178,7 @@ possibilistic_linear_regression <- function(x, y, confidences=c(0.5, 0.75, 0.95)
                              "], slope_confs[", i,
                              "], slope_interval$slope_min[", i,
                              "], slope_interval$slope_max[", i,
-                             "], dataframe, band_slope=F, band_diags=F, band_border_type=NA, alpha=alphas[", i,
+                             "], dataframe, band_slope=F, band_diags=F, band_border_type=NA, alpha=confidences[", i,
                              "])")
       eval(parse(text=command_line))
     }
